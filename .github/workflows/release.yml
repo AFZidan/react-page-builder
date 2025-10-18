@@ -5,12 +5,13 @@ on:
         tags:
             - "v*"
 
+permissions:
+    contents: write
+    pull-requests: write
+
 jobs:
     generate-changelog:
         runs-on: ubuntu-latest
-        permissions:
-            contents: write
-            pull-requests: write
 
         steps:
             - name: Checkout code
