@@ -1,6 +1,6 @@
 {
   "name": "@ahmedzidan/react-page-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A visual drag-and-drop page builder for React with support for custom components, responsive design, and advanced styling",
   "main": "./dist/page-builder.cjs",
   "module": "./dist/page-builder.es.js",
