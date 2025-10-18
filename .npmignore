@@ -1,0 +1,9 @@
+src/
+node_modules/
+*.log
+.DS_Store
+vite.config.js
+.vscode/
+.cursor/
+.idea
+

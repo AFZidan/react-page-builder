@@ -1,0 +1,71 @@
+{
+  "name": "@hizidan/page-builder",
+  "version": "1.0.0",
+  "description": "A visual drag-and-drop page builder for React with support for custom components, responsive design, and advanced styling",
+  "main": "./dist/page-builder.cjs",
+  "module": "./dist/page-builder.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/page-builder.es.js",
+      "require": "./dist/page-builder.cjs"
+    },
+    "./styles.css": "./dist/style.css"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "page-builder",
+    "visual-editor",
+    "drag-and-drop",
+    "react",
+    "wysiwyg",
+    "website-builder",
+    "cms",
+    "responsive-design",
+    "bootstrap-grid",
+    "component-library"
+  ],
+  "author": "Zidan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hizidan/page-builder.git"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    },
+    "daisyui": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "react-markdown": "^9.0.1",
+    "react-colorful": "^6.0.0",
+    "@heroicons/react": "^2.2.0",
+    "lucide-react": "^0.546.0",
+    "react-hook-form": "^7.51.5",
+    "@hookform/resolvers": "^3.4.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.0"
+  }
+}
+
