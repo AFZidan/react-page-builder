@@ -1,0 +1,167 @@
+name: Generate Release and Changelog
+
+on:
+    push:
+        tags:
+            - "v*"
+
+jobs:
+    generate-changelog:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: write
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0 # Fetch all history for changelog generation
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "18"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm install -g conventional-changelog-cli
+
+            - name: Generate Changelog
+              run: |
+                  # Generate changelog for this version
+                  conventional-changelog -p angular -i CHANGELOG.md -s -r 0
+
+                  # Display the generated changelog
+                  echo "Generated CHANGELOG.md:"
+                  head -50 CHANGELOG.md
+
+            - name: Extract version from tag
+              id: get_version
+              run: |
+                  VERSION=${GITHUB_REF#refs/tags/v}
+                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+                  echo "Version: $VERSION"
+
+            - name: Extract latest changes for release notes
+              id: extract_changes
+              run: |
+                  # Extract changes between the last two version headers
+                  CHANGES=$(awk '/^## \[/{if (++count == 2) exit} count == 1' CHANGELOG.md)
+
+                  # If no changes found, use a default message
+                  if [ -z "$CHANGES" ]; then
+                    CHANGES="## What's Changed\n\nSee CHANGELOG.md for details."
+                  fi
+
+                  # Save to file for release notes
+                  echo "$CHANGES" > release_notes.md
+
+                  echo "Release notes:"
+                  cat release_notes.md
+
+            - name: Commit updated CHANGELOG
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name "github-actions[bot]"
+
+                  # Check if CHANGELOG.md has changes
+                  if git diff --quiet CHANGELOG.md; then
+                    echo "No changes to CHANGELOG.md"
+                  else
+                    git add CHANGELOG.md
+                    git commit -m "docs(changelog): update CHANGELOG.md for v${{ steps.get_version.outputs.version }} [skip ci]"
+                    git push origin HEAD:main
+                  fi
+
+            - name: Create GitHub Release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: Release v${{ steps.get_version.outputs.version }}
+                  body_path: release_notes.md
+                  draft: false
+                  prerelease: false
+
+            - name: Generate detailed release notes
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const tag = context.ref.replace('refs/tags/', '');
+                      const version = tag.replace('v', '');
+
+                      // Get all commits since last tag
+                      const { data: tags } = await github.rest.repos.listTags({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        per_page: 2
+                      });
+
+                      let previousTag = null;
+                      if (tags.length > 1) {
+                        previousTag = tags[1].name;
+                      }
+
+                      // Get commits
+                      const commits = previousTag
+                        ? await github.rest.repos.compareCommits({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            base: previousTag,
+                            head: tag
+                          })
+                        : await github.rest.repos.listCommits({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo
+                          });
+
+                      const commitMessages = previousTag 
+                        ? commits.data.commits.map(c => c.commit.message)
+                        : commits.data.map(c => c.commit.message);
+
+                      // Categorize commits
+                      const features = [];
+                      const fixes = [];
+                      const docs = [];
+                      const others = [];
+
+                      commitMessages.forEach(msg => {
+                        const firstLine = msg.split('\n')[0];
+                        if (firstLine.startsWith('feat')) features.push(firstLine);
+                        else if (firstLine.startsWith('fix')) fixes.push(firstLine);
+                        else if (firstLine.startsWith('docs')) docs.push(firstLine);
+                        else others.push(firstLine);
+                      });
+
+                      // Build release notes
+                      let releaseNotes = `# Release v${version}\n\n`;
+
+                      if (features.length > 0) {
+                        releaseNotes += '## ✨ Features\n\n';
+                        features.forEach(f => releaseNotes += `- ${f}\n`);
+                        releaseNotes += '\n';
+                      }
+
+                      if (fixes.length > 0) {
+                        releaseNotes += '## 🐛 Bug Fixes\n\n';
+                        fixes.forEach(f => releaseNotes += `- ${f}\n`);
+                        releaseNotes += '\n';
+                      }
+
+                      if (docs.length > 0) {
+                        releaseNotes += '## 📚 Documentation\n\n';
+                        docs.forEach(d => releaseNotes += `- ${d}\n`);
+                        releaseNotes += '\n';
+                      }
+
+                      if (others.length > 0) {
+                        releaseNotes += '## 🔧 Other Changes\n\n';
+                        others.forEach(o => releaseNotes += `- ${o}\n`);
+                      }
+
+                      console.log('Generated Release Notes:');
+                      console.log(releaseNotes);
+
+                      core.setOutput('release_notes', releaseNotes);

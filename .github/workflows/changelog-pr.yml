@@ -1,0 +1,117 @@
+name: Update Changelog on PR
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened]
+        branches:
+            - main
+    push:
+        branches:
+            - main
+
+jobs:
+    preview-changelog:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "18"
+
+            - name: Install conventional-changelog
+              run: npm install -g conventional-changelog-cli
+
+            - name: Generate changelog preview
+              id: changelog
+              run: |
+                  # Generate preview of what would be added to changelog
+                  conventional-changelog -p angular -u > changelog_preview.md
+
+                  # If preview is too long, truncate it
+                  if [ $(wc -l < changelog_preview.md) -gt 50 ]; then
+                    head -50 changelog_preview.md > changelog_preview_truncated.md
+                    echo "" >> changelog_preview_truncated.md
+                    echo "... (truncated)" >> changelog_preview_truncated.md
+                    mv changelog_preview_truncated.md changelog_preview.md
+                  fi
+
+                  echo "Generated preview:"
+                  cat changelog_preview.md
+
+            - name: Comment PR with changelog preview
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const preview = fs.readFileSync('changelog_preview.md', 'utf8');
+
+                      const body = `## 📝 Changelog Preview
+
+                      Here's what will be added to the changelog when this PR is merged:
+
+                      ${preview}
+
+                      ---
+                      *This preview is automatically generated based on your commit messages.*
+                      *Make sure your commits follow [Conventional Commits](https://www.conventionalcommits.org/) format.*`;
+
+                      // Find existing comment
+                      const { data: comments } = await github.rest.issues.listComments({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.issue.number
+                      });
+
+                      const botComment = comments.find(comment => 
+                        comment.user.type === 'Bot' && 
+                        comment.body.includes('📝 Changelog Preview')
+                      );
+
+                      if (botComment) {
+                        // Update existing comment
+                        await github.rest.issues.updateComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: botComment.id,
+                          body: body
+                        });
+                      } else {
+                        // Create new comment
+                        await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.issue.number,
+                          body: body
+                        });
+                      }
+
+            - name: Validate commit messages
+              run: |
+                  # Check if commits follow conventional commit format
+                  COMMITS=$(git log --format=%s origin/main..HEAD)
+
+                  INVALID_COMMITS=""
+                  while IFS= read -r commit; do
+                    if ! echo "$commit" | grep -qE '^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .+'; then
+                      INVALID_COMMITS="${INVALID_COMMITS}\n- ${commit}"
+                    fi
+                  done <<< "$COMMITS"
+
+                  if [ ! -z "$INVALID_COMMITS" ]; then
+                    echo "⚠️ Warning: Some commits don't follow Conventional Commits format:"
+                    echo -e "$INVALID_COMMITS"
+                    echo ""
+                    echo "Consider updating these commits to follow the format:"
+                    echo "  type(scope): subject"
+                    echo ""
+                    echo "Valid types: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert"
+                    exit 0  # Don't fail the build, just warn
+                  else
+                    echo "✅ All commits follow Conventional Commits format!"
+                  fi

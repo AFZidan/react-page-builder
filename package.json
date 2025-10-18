@@ -1,6 +1,6 @@
 {
   "name": "@ahmedzidan/react-page-builder",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A visual drag-and-drop page builder for React with support for custom components, responsive design, and advanced styling",
   "main": "./dist/page-builder.cjs",
   "module": "./dist/page-builder.es.js",
@@ -29,6 +29,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
+    "changelog": "bash scripts/generate-changelog.sh",
+    "release:preview": "node scripts/preview-release-notes.js",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "preversion": "npm run lint && npm run test",
     "postversion": "git push && git push --tags"
