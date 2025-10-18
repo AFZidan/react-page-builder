@@ -39,7 +39,7 @@ cd packages/page-builder
 
 ```json
 {
-  "name": "@hizidan/page-builder",
+  "name": "@ahmedzidan/page-builder",
   "version": "1.0.0",
   "description": "A visual drag-and-drop page builder for React with support for custom components, responsive design, and advanced styling",
   "main": "./dist/page-builder.cjs",
@@ -212,7 +212,7 @@ export default function PageBuilder({
 ## Step 6: Create README.md
 
 ```markdown
-# @hizidan/page-builder
+# @ahmedzidan/page-builder
 
 A powerful visual drag-and-drop page builder for React applications.
 
@@ -232,9 +232,9 @@ A powerful visual drag-and-drop page builder for React applications.
 ## Installation
 
 \`\`\`bash
-npm install @hizidan/page-builder
+npm install @ahmedzidan/page-builder
 # or
-yarn add @hizidan/page-builder
+yarn add @ahmedzidan/page-builder
 \`\`\`
 
 ### Peer Dependencies
@@ -252,8 +252,8 @@ Optional (for styling):
 ### Basic Example
 
 \`\`\`jsx
-import { PageBuilder, Renderer } from '@hizidan/page-builder';
-import '@hizidan/page-builder/styles.css';
+import { PageBuilder, Renderer } from '@ahmedzidan/page-builder';
+import '@ahmedzidan/page-builder/styles.css';
 
 function App() {
   const [components, setComponents] = useState([]);
@@ -283,7 +283,7 @@ function App() {
 ### Rendering Pages
 
 \`\`\`jsx
-import { Renderer } from '@hizidan/page-builder';
+import { Renderer } from '@ahmedzidan/page-builder';
 
 function PublicPage({ pageData }) {
   return (
@@ -324,7 +324,7 @@ The package includes minimal CSS for core functionality. For full styling suppor
 2. Import the package styles:
 
 \`\`\`jsx
-import '@hizidan/page-builder/styles.css';
+import '@ahmedzidan/page-builder/styles.css';
 \`\`\`
 
 ## License
@@ -362,7 +362,7 @@ npm run build
 # In your main app's package.json
 {
   "dependencies": {
-    "@hizidan/page-builder": "file:./packages/page-builder"
+    "@ahmedzidan/page-builder": "file:./packages/page-builder"
   }
 }
 ```

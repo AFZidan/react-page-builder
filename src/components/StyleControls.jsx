@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
-import { useSiteSettings } from '../../../contexts/SiteSettingsContext';
 
-export function ColorPicker({ label, value, onChange, showBrandColors = false }) {
-  const { settings } = useSiteSettings();
-  const brandColors = settings.brandColors || [];
+export function ColorPicker({ label, value, onChange, showBrandColors = false, brandColors = [] }) {
+  // brandColors can be passed as a prop for standalone usage
   const [showPicker, setShowPicker] = useState(false);
 
   return (

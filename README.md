@@ -1,4 +1,4 @@
-# @hizidan/page-builder
+# @ahmedzidan/page-builder
 
 A powerful visual drag-and-drop page builder for React applications with advanced features and Bootstrap grid support.
 
@@ -20,11 +20,11 @@ A powerful visual drag-and-drop page builder for React applications with advance
 ## 📦 Installation
 
 ```bash
-npm install @hizidan/page-builder
+npm install @ahmedzidan/page-builder
 # or
-yarn add @hizidan/page-builder
+yarn add @ahmedzidan/page-builder
 # or
-pnpm add @hizidan/page-builder
+pnpm add @ahmedzidan/page-builder
 ```
 
 ### Peer Dependencies
@@ -44,8 +44,8 @@ Optional (for full styling support):
 ### Basic Usage
 
 ```jsx
-import { PageBuilder } from '@hizidan/page-builder';
-import '@hizidan/page-builder/styles.css';
+import { PageBuilder } from '@ahmedzidan/page-builder';
+import '@ahmedzidan/page-builder/styles.css';
 
 function App() {
   const [components, setComponents] = useState([]);
@@ -76,7 +76,7 @@ function App() {
 ### Rendering Pages
 
 ```jsx
-import { Renderer } from '@hizidan/page-builder';
+import { Renderer } from '@ahmedzidan/page-builder';
 
 function PublicPage({ pageData }) {
   return (
@@ -152,7 +152,7 @@ npm install -D tailwindcss daisyui
 module.exports = {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
-    './node_modules/@hizidan/page-builder/**/*.{js,jsx}'
+    './node_modules/@ahmedzidan/page-builder/**/*.{js,jsx}'
   ],
   plugins: [require('daisyui')],
 }
@@ -161,7 +161,7 @@ module.exports = {
 3. **Import styles:**
 
 ```jsx
-import '@hizidan/page-builder/styles.css';
+import '@ahmedzidan/page-builder/styles.css';
 ```
 
 ## 🎯 Examples
@@ -297,7 +297,7 @@ For comprehensive documentation, examples, and integration guides:
 ## 🔗 Links
 
 - [Documentation](docs/README.md)
-- [Issues](https://github.com/hizidan/page-builder/issues)
+- [Issues](https://github.com/AFZidan/react-page-builder/issues)
 - [Changelog](CHANGELOG.md)
 
 ## 💡 Tips

@@ -32,7 +32,7 @@ The Page Builder Package is a React-based visual page builder that allows users 
 
 ### NPM Package Installation
 ```bash
-npm install @hizidan/page-builder
+npm install @ahmedzidan/page-builder
 ```
 
 ### Dependencies
@@ -48,7 +48,7 @@ npm install react-markdown
 
 ### Simple Integration
 ```jsx
-import { PageBuilder } from '@hizidan/page-builder';
+import { PageBuilder } from '@ahmedzidan/page-builder';
 
 function App() {
   const handleSave = async (data) => {
@@ -76,7 +76,7 @@ function App() {
 
 ### With Custom Configuration
 ```jsx
-import { PageBuilder } from '@hizidan/page-builder';
+import { PageBuilder } from '@ahmedzidan/page-builder';
 
 function MyPageBuilder() {
   const config = {
@@ -511,7 +511,7 @@ module.exports = FileStorage;
 ### Loading Pages in the Builder
 
 ```jsx
-import { PageBuilder } from '@hizidan/page-builder';
+import { PageBuilder } from '@ahmedzidan/page-builder';
 import { useState, useEffect } from 'react';
 
 function PageEditor({ pageId }) {
@@ -575,7 +575,7 @@ function PageEditor({ pageId }) {
 ### Using the Renderer Component
 
 ```jsx
-import { Renderer } from '@hizidan/page-builder';
+import { Renderer } from '@ahmedzidan/page-builder';
 
 function PublishedPage({ pageId }) {
   const [page, setPage] = useState(null);
@@ -878,7 +878,7 @@ function App() {
 ```jsx
 // App.jsx
 import React, { useState, useEffect } from 'react';
-import { PageBuilder, Renderer } from '@hizidan/page-builder';
+import { PageBuilder, Renderer } from '@ahmedzidan/page-builder';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(null);

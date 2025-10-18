@@ -166,7 +166,7 @@ export const usePages = () => {
 // pages/PageEditor.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PageBuilder } from '@hizidan/page-builder';
+import { PageBuilder } from '@ahmedzidan/page-builder';
 import { usePages } from '../contexts/PageContext';
 import Loading from '../components/Common/Loading';
 
@@ -454,7 +454,7 @@ import dynamic from 'next/dynamic';
 import Head from 'next/head';
 
 // Dynamic import to avoid SSR issues
-const PageBuilder = dynamic(() => import('@hizidan/page-builder'), {
+const PageBuilder = dynamic(() => import('@ahmedzidan/page-builder'), {
   ssr: false,
   loading: () => <div>Loading page builder...</div>
 });
@@ -540,7 +540,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 
-const Renderer = dynamic(() => import('@hizidan/page-builder').then(mod => ({ default: mod.Renderer })), {
+const Renderer = dynamic(() => import('@ahmedzidan/page-builder').then(mod => ({ default: mod.Renderer })), {
   ssr: false,
   loading: () => <div>Loading page...</div>
 });

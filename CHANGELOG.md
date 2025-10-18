@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-10-18
 
 ### Added
-- Initial release of @hizidan/page-builder
+
+- Initial release of @ahmedzidan/page-builder
 - Visual drag-and-drop page builder component
 - 20+ built-in component types (text, images, forms, containers, etc.)
 - Device preview with Mobile (375px), Tablet (768px), Desktop (1440px) presets
@@ -42,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom CSS field for advanced users
 
 ### Component Library
+
 - **Layout**: Container, 2-Column Grid
 - **Content**: Heading, Text, Button, Image
 - **Spacing**: Divider, Spacer
@@ -49,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Forms**: Form Container, Input, Textarea, Select, Checkbox, Radio Group, File Upload, Date Picker, Submit Button
 
 ### Features
+
 - Drag elements from anywhere (not just handles)
 - Auto-select on drag start
 - Smart initial positioning (no overlaps)
@@ -62,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Persistent preferences (localStorage)
 
 ### Developer Experience
+
 - Clean component API
 - Prop-based configuration
 - Minimal CSS dependencies
@@ -69,5 +73,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive documentation
 - MIT licensed
 
-[1.0.0]: https://github.com/hizidan/page-builder/releases/tag/v1.0.0
-
+[1.0.0]: https://github.com/AFZidan/react-page-builder/releases/tag/v1.0.0

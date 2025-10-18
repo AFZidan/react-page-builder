@@ -4,12 +4,12 @@
 
 ### 1. Install Package
 ```bash
-npm install @hizidan/page-builder
+npm install @ahmedzidan/page-builder
 ```
 
 ### 2. Basic Usage
 ```jsx
-import { PageBuilder } from '@hizidan/page-builder';
+import { PageBuilder } from '@ahmedzidan/page-builder';
 
 function MyApp() {
   const handleSave = (data) => {

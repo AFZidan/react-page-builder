@@ -86,7 +86,7 @@ If you want to test using the package in your own app:
 # In your main app's package.json, add:
 {
   "dependencies": {
-    "@hizidan/page-builder": "file:./packages/page-builder"
+    "@ahmedzidan/page-builder": "file:./packages/page-builder"
   }
 }
 
