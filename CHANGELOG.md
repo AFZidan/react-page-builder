@@ -1,3 +1,11 @@
+## [1.0.13](https://github.com/AFZidan/react-page-builder/compare/v1.0.12...v1.0.13) (2025-10-19)
+
+
+
+## [1.0.12](https://github.com/AFZidan/react-page-builder/compare/v1.0.9...v1.0.12) (2025-10-19)
+
+
+
 ## [1.0.9](https://github.com/AFZidan/react-page-builder/compare/v1.0.8...v1.0.9) (2025-10-19)
 
 
