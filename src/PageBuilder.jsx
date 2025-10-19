@@ -115,6 +115,111 @@ export default function PageBuilder({
     return Math.round(value / gridSize) * gridSize;
   };
 
+  // Delete component (supports nested) - MOVED HERE to avoid TDZ
+  const deleteComponent = useCallback((id) => {
+    const deleteNested = (items) => {
+      return items.filter(c => c.id !== id).map(c => {
+        if (c.children) {
+          return { ...c, children: deleteNested(c.children) };
+        }
+        return c;
+      });
+    };
+    setComponents(deleteNested(components));
+    setSelectedId(null);
+  }, [components]);
+
+  // Find component by ID (supports nested) - MOVED HERE to avoid TDZ
+  const findComponent = useCallback((id, items = components) => {
+    for (const item of items) {
+      if (item.id === id) return item;
+      if (item.children) {
+        const found = findComponent(id, item.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  }, [components]);
+
+  // Update component (supports nested) - MOVED HERE to avoid TDZ
+  const updateComponent = useCallback((id, updates) => {
+    const updateNested = (items) => {
+      return items.map(c => {
+        if (c.id === id) {
+          return { ...c, ...updates };
+        }
+        if (c.children) {
+          return { ...c, children: updateNested(c.children) };
+        }
+        return c;
+      });
+    };
+    setComponents(updateNested(components));
+  }, [components]);
+
+  // Helper to parse px values - MOVED HERE to avoid TDZ
+  const parsePx = (value) => {
+    if (typeof value === 'string' && value.endsWith('px')) {
+      return parseFloat(value) || 0;
+    }
+    if (typeof value === 'number') return value;
+    return 0;
+  };
+
+  // Auto-resize container to fit children - MOVED HERE to avoid TDZ
+  const recalcContainerSize = useCallback((parentId) => {
+    const parent = findComponent(parentId);
+    if (!parent || !parent.children || parent.children.length === 0) return;
+
+    const children = parent.children;
+    const padding = 16;
+
+    // Calculate bounds
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+    children.forEach(child => {
+      const x = child.position?.x || 0;
+      const y = child.position?.y || 0;
+      const w = parsePx(child.width) || 0;
+      const h = parsePx(child.height) || 0;
+
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x + w);
+      maxY = Math.max(maxY, y + h);
+    });
+
+    // If no valid bounds, set defaults
+    if (!isFinite(minX)) return;
+
+    // Normalize children positions if any are negative
+    if (minX < 0 || minY < 0) {
+      const offsetX = Math.max(0, -minX + padding);
+      const offsetY = Math.max(0, -minY + padding);
+      
+      children.forEach(child => {
+        updateComponent(child.id, {
+          position: {
+            x: (child.position?.x || 0) + offsetX,
+            y: (child.position?.y || 0) + offsetY
+          }
+        });
+      });
+
+      maxX += offsetX;
+      maxY += offsetY;
+    }
+
+    // Calculate new container size
+    const newWidth = Math.max(200, Math.ceil(maxX - minX) + padding * 2);
+    const newHeight = Math.max(100, Math.ceil(maxY - minY) + padding * 2);
+
+    updateComponent(parentId, {
+      width: `${newWidth}px`,
+      height: `${newHeight}px`
+    });
+  }, [updateComponent, findComponent]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -542,21 +647,6 @@ export default function PageBuilder({
   };
 
   // Update component (supports nested)
-  const updateComponent = useCallback((id, updates) => {
-    const updateNested = (items) => {
-      return items.map(c => {
-        if (c.id === id) {
-          return { ...c, ...updates };
-        }
-        if (c.children) {
-          return { ...c, children: updateNested(c.children) };
-        }
-        return c;
-      });
-    };
-    setComponents(updateNested(components));
-  }, [components]);
-
   // Helper to update component styles
   const updateComponentStyle = (property, value) => {
     if (!selectedId) return;
@@ -566,69 +656,6 @@ export default function PageBuilder({
       styles: { ...(component.styles || {}), [property]: value }
     });
   };
-
-  // Helper to parse px values
-  const parsePx = (value) => {
-    if (typeof value === 'string' && value.endsWith('px')) {
-      return parseFloat(value) || 0;
-    }
-    if (typeof value === 'number') return value;
-    return 0;
-  };
-
-  // Auto-resize container to fit children
-  const recalcContainerSize = useCallback((parentId) => {
-    const parent = findComponent(parentId);
-    if (!parent || !parent.children || parent.children.length === 0) return;
-
-    const children = parent.children;
-    const padding = 16;
-
-    // Calculate bounds
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-    children.forEach(child => {
-      const x = child.position?.x || 0;
-      const y = child.position?.y || 0;
-      const w = parsePx(child.width) || 0;
-      const h = parsePx(child.height) || 0;
-
-      minX = Math.min(minX, x);
-      minY = Math.min(minY, y);
-      maxX = Math.max(maxX, x + w);
-      maxY = Math.max(maxY, y + h);
-    });
-
-    // If no valid bounds, set defaults
-    if (!isFinite(minX)) return;
-
-    // Normalize children positions if any are negative
-    if (minX < 0 || minY < 0) {
-      const offsetX = Math.max(0, -minX + padding);
-      const offsetY = Math.max(0, -minY + padding);
-      
-      children.forEach(child => {
-        updateComponent(child.id, {
-          position: {
-            x: (child.position?.x || 0) + offsetX,
-            y: (child.position?.y || 0) + offsetY
-          }
-        });
-      });
-
-      maxX += offsetX;
-      maxY += offsetY;
-    }
-
-    // Calculate new container size
-    const newWidth = Math.max(200, Math.ceil(maxX - minX) + padding * 2);
-    const newHeight = Math.max(100, Math.ceil(maxY - minY) + padding * 2);
-
-    updateComponent(parentId, {
-      width: `${newWidth}px`,
-      height: `${newHeight}px`
-    });
-  }, [updateComponent, findComponent]);
 
   // Generate inline styles from visual controls
   const generateInlineStyles = (component) => {
@@ -680,32 +707,6 @@ export default function PageBuilder({
     
     return styles;
   };
-
-  // Delete component (supports nested)
-  const deleteComponent = useCallback((id) => {
-    const deleteNested = (items) => {
-      return items.filter(c => c.id !== id).map(c => {
-        if (c.children) {
-          return { ...c, children: deleteNested(c.children) };
-        }
-        return c;
-      });
-    };
-    setComponents(deleteNested(components));
-    setSelectedId(null);
-  }, [components]);
-
-  // Find component by ID (supports nested)
-  const findComponent = useCallback((id, items = components) => {
-    for (const item of items) {
-      if (item.id === id) return item;
-      if (item.children) {
-        const found = findComponent(id, item.children);
-        if (found) return found;
-      }
-    }
-    return null;
-  }, [components]);
 
   // Duplicate component
   const duplicateComponent = (id) => {

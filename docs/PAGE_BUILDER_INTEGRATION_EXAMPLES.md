@@ -1,6 +1,7 @@
 # Page Builder Integration Examples
 
 ## Table of Contents
+
 1. [Complete React App Integration](#complete-react-app-integration)
 2. [Next.js Integration](#nextjs-integration)
 3. [Express.js Backend](#expressjs-backend)
@@ -11,10 +12,12 @@
 8. [Authentication Integration](#authentication-integration)
 9. [Multi-tenant Setup](#multi-tenant-setup)
 10. [Advanced Features](#advanced-features)
+11. [Troubleshooting](#troubleshooting)
 
 ## Complete React App Integration
 
 ### App Structure
+
 ```
 src/
 ├── components/
@@ -42,6 +45,7 @@ src/
 ```
 
 ### Main App Component
+
 ```jsx
 // App.jsx
 import React, { useState } from 'react';
@@ -76,6 +80,7 @@ export default App;
 ```
 
 ### Page Context
+
 ```jsx
 // contexts/PageContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -162,6 +167,7 @@ export const usePages = () => {
 ```
 
 ### Page Editor Component
+
 ```jsx
 // pages/PageEditor.jsx
 import React, { useState, useEffect } from 'react';
@@ -251,6 +257,7 @@ export default PageEditor;
 ```
 
 ### API Service
+
 ```jsx
 // services/api.js
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
@@ -327,6 +334,7 @@ export const pageService = new ApiService();
 ## Next.js Integration
 
 ### Next.js App Structure
+
 ```
 pages/
 ├── api/
@@ -352,6 +360,7 @@ components/
 ```
 
 ### API Routes
+
 ```javascript
 // pages/api/pages/index.js
 import { PrismaClient } from '@prisma/client';
@@ -446,6 +455,7 @@ export default async function handler(req, res) {
 ```
 
 ### Page Editor (Next.js)
+
 ```jsx
 // pages/admin/pages/[id]/edit.js
 import { useState, useEffect } from 'react';
@@ -533,6 +543,7 @@ export default function PageEditor() {
 ```
 
 ### Dynamic Page Rendering
+
 ```jsx
 // pages/[slug].js
 import { useState, useEffect } from 'react';
@@ -600,6 +611,7 @@ export default function DynamicPage() {
 ## Express.js Backend
 
 ### Complete Express Server
+
 ```javascript
 // server.js
 const express = require('express');
@@ -826,6 +838,7 @@ process.on('SIGINT', async () => {
 ## NestJS Backend
 
 ### Pages Module
+
 ```typescript
 // pages.module.ts
 import { Module } from '@nestjs/common';
@@ -843,6 +856,7 @@ export class PagesModule {}
 ```
 
 ### Pages Service
+
 ```typescript
 // pages.service.ts
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
@@ -1007,6 +1021,7 @@ export class PagesService {
 ```
 
 ### Pages Controller
+
 ```typescript
 // pages.controller.ts
 import {
@@ -1093,6 +1108,7 @@ export class PagesController {
 ```
 
 ### DTOs
+
 ```typescript
 // dto/create-page.dto.ts
 import { IsString, IsOptional, IsObject, IsEnum } from 'class-validator';
@@ -1130,6 +1146,7 @@ export class UpdatePageDto extends PartialType(CreatePageDto) {}
 ## MongoDB Integration
 
 ### MongoDB Schema
+
 ```javascript
 // models/Page.js
 const mongoose = require('mongoose');
@@ -1193,6 +1210,7 @@ module.exports = mongoose.model('Page', pageSchema);
 ```
 
 ### MongoDB Service
+
 ```javascript
 // services/pageService.js
 const Page = require('../models/Page');
@@ -1309,6 +1327,7 @@ module.exports = new PageService();
 ## PostgreSQL Integration
 
 ### Prisma Schema
+
 ```prisma
 // schema.prisma
 generator client {
@@ -1367,6 +1386,7 @@ enum PageStatus {
 ```
 
 ### Prisma Service
+
 ```typescript
 // prisma.service.ts
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
@@ -1387,6 +1407,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 ## File-based Storage
 
 ### File Storage Service
+
 ```javascript
 // services/fileStorage.js
 const fs = require('fs').promises;
@@ -1560,6 +1581,7 @@ module.exports = FileStorageService;
 ## Authentication Integration
 
 ### JWT Authentication
+
 ```javascript
 // middleware/auth.js
 const jwt = require('jsonwebtoken');
@@ -1599,6 +1621,7 @@ module.exports = { authenticateToken, requireRole };
 ```
 
 ### Role-based Access Control
+
 ```javascript
 // routes/pages.js
 const express = require('express');
@@ -1665,6 +1688,7 @@ module.exports = router;
 ## Multi-tenant Setup
 
 ### Tenant-aware Service
+
 ```javascript
 // services/multiTenantPageService.js
 class MultiTenantPageService {
@@ -1741,6 +1765,7 @@ module.exports = new MultiTenantPageService();
 ```
 
 ### Tenant Middleware
+
 ```javascript
 // middleware/tenant.js
 const getTenantFromRequest = (req) => {
@@ -1774,6 +1799,7 @@ module.exports = { tenantMiddleware, getTenantFromRequest };
 ## Advanced Features
 
 ### Real-time Collaboration
+
 ```javascript
 // services/collaborationService.js
 const EventEmitter = require('events');
@@ -1882,6 +1908,7 @@ module.exports = new CollaborationService();
 ```
 
 ### Version History
+
 ```javascript
 // services/versionService.js
 class VersionService {
@@ -1955,6 +1982,7 @@ module.exports = VersionService;
 ```
 
 ### Performance Optimization
+
 ```javascript
 // services/cacheService.js
 const Redis = require('redis');
@@ -2015,4 +2043,251 @@ module.exports = new CacheService();
 
 ---
 
-This comprehensive integration guide covers various backend implementations, authentication patterns, multi-tenancy, and advanced features. Choose the approach that best fits your project requirements and scale.
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### 1. "Cannot access [variable] before initialization" Error
+
+**Error Message:**
+
+```
+ReferenceError: Cannot access 'deleteComponent' before initialization
+ReferenceError: Cannot access 'recalcContainerSize' before initialization
+ReferenceError: Cannot access 'updateComponent' before initialization
+```
+
+**Root Cause:**
+This is a **Temporal Dead Zone (TDZ)** error caused by improper function declaration order in React components. When using `useCallback` hooks, functions must be declared **before** they're referenced in `useEffect` dependency arrays.
+
+**Solution:**
+Ensure all callback functions are declared at the top of your component, before any `useEffect` hooks that use them.
+
+**Correct Order:**
+
+```jsx
+function MyPageBuilder() {
+  // 1. State declarations
+  const [components, setComponents] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  
+  // 2. Helper functions (non-callback)
+  const snapToGrid = (value, gridSize = 10) => {
+    return Math.round(value / gridSize) * gridSize;
+  };
+  
+  // 3. Callback functions that don't depend on other callbacks
+  const deleteComponent = useCallback((id) => {
+    // ... implementation
+  }, [components]);
+  
+  const findComponent = useCallback((id, items = components) => {
+    // ... implementation
+  }, [components]);
+  
+  // 4. Callback functions that depend on other callbacks
+  const updateComponent = useCallback((id, updates) => {
+    // ... implementation
+  }, [components]);
+  
+  const recalcContainerSize = useCallback((parentId) => {
+    const parent = findComponent(parentId); // ✅ findComponent is already declared
+    // ... implementation
+  }, [findComponent, updateComponent]); // ✅ Dependencies are already declared
+  
+  // 5. Effects that use the callbacks
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      deleteComponent(selectedId); // ✅ Works because declared above
+    };
+    // ...
+  }, [selectedId, deleteComponent]); // ✅ All dependencies declared above
+  
+  // 6. Rest of component
+}
+```
+
+**If Building a Package:**
+When building the PageBuilder as an npm package with Vite, also ensure:
+
+```javascript
+// vite.config.js
+export default defineConfig({
+  build: {
+    minify: false, // Disable minification to preserve declaration order
+    rollupOptions: {
+      output: {
+        hoistTransitiveImports: false, // Prevent function hoisting
+      },
+    },
+  },
+});
+```
+
+#### 2. Package Import Errors
+
+**Error Message:**
+
+```
+Failed to resolve import "@your-package/page-builder"
+```
+
+**Solution:**
+Ensure the package is properly installed and exported:
+
+```bash
+# Check if package is installed
+npm list @your-package/page-builder
+
+# If missing, install it
+npm install @your-package/page-builder
+
+# Clear cache if needed
+rm -rf node_modules/.vite
+npm run dev
+```
+
+#### 3. Styles Not Applied
+
+**Issue:** Components render but styling is missing.
+
+**Solution:**
+Import the package styles if they're separate:
+
+```jsx
+import { PageBuilder } from '@your-package/page-builder';
+// If the package has separate CSS (check package.json exports)
+import '@your-package/page-builder/styles.css';
+```
+
+#### 4. Keyboard Shortcuts Not Working
+
+**Issue:** Enter, Delete, or Escape keys don't work in the builder.
+
+**Possible Causes:**
+
+1. Functions are declared after they're used (TDZ error)
+2. Event listeners not properly attached
+3. Input/textarea is focused (shortcuts are intentionally disabled)
+
+**Solution:**
+
+1. Fix function declaration order (see #1 above)
+2. Ensure you're not in edit mode when testing shortcuts
+3. Check browser console for errors
+
+#### 5. Container Auto-Resize Not Working
+
+**Issue:** Containers don't automatically resize when adding children.
+
+**Solution:**
+Ensure `recalcContainerSize` is:
+
+1. Declared before any useEffect that uses it
+2. Properly memoized with useCallback
+3. Has correct dependencies: `[findComponent, updateComponent]`
+
+```jsx
+const recalcContainerSize = useCallback((parentId) => {
+  const parent = findComponent(parentId);
+  if (!parent || !parent.children) return;
+  
+  // Calculate bounds and update size
+  // ... implementation
+}, [findComponent, updateComponent]);
+```
+
+#### 6. Performance Issues with Large Pages
+
+**Issue:** Builder becomes slow with many components.
+
+**Solutions:**
+
+1. **Implement virtualization:**
+
+```jsx
+import { FixedSizeList } from 'react-window';
+
+// Render only visible components in the palette
+<FixedSizeList
+  height={600}
+  itemCount={components.length}
+  itemSize={80}
+>
+  {({ index, style }) => (
+    <div style={style}>{renderComponent(components[index])}</div>
+  )}
+</FixedSizeList>
+```
+
+2. **Memoize expensive operations:**
+
+```jsx
+const memoizedComponent = useMemo(() => (
+  <RenderComponent component={component} />
+), [component.id, component.content, component.styles]);
+```
+
+3. **Debounce updates:**
+
+```jsx
+import { debounce } from 'lodash';
+
+const debouncedUpdate = useMemo(
+  () => debounce((id, updates) => {
+    updateComponent(id, updates);
+  }, 300),
+  [updateComponent]
+);
+```
+
+#### 7. Build Errors
+
+**Error Message:**
+
+```
+Module not found: Can't resolve 'react/jsx-runtime'
+```
+
+**Solution:**
+Ensure peer dependencies are properly configured:
+
+```json
+// package.json
+{
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  }
+}
+```
+
+Install with legacy peer deps if needed:
+
+```bash
+npm install @your-package/page-builder --legacy-peer-deps
+```
+
+### Best Practices
+
+1. **Always declare callbacks before effects**
+2. **Use proper dependency arrays** in useCallback and useEffect
+3. **Memoize expensive computations** with useMemo
+4. **Test in both development and production builds**
+5. **Disable minification** for library packages to avoid hoisting issues
+6. **Provide clear error boundaries** for better error handling
+7. **Document all props and callbacks** for easier integration
+
+### Getting Help
+
+If you encounter issues not covered here:
+
+1. Check the browser console for detailed error messages
+2. Verify the package version matches your React version
+3. Review the [API Reference](PAGE_BUILDER_API_REFERENCE.md)
+4. Check [GitHub Issues](https://github.com/hizidan/page-builder/issues)
+5. Ensure all dependencies are correctly installed
+
+---
+
+This comprehensive integration guide covers various backend implementations, authentication patterns, multi-tenancy, advanced features, and troubleshooting. Choose the approach that best fits your project requirements and scale.

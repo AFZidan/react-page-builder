@@ -18,6 +18,7 @@ export default defineConfig({
         "react/jsx-runtime",
         "react-markdown",
         "react-colorful",
+        "@heroicons/react",
         "@heroicons/react/24/outline",
         "lucide-react",
         "react-hook-form",
@@ -25,14 +26,26 @@ export default defineConfig({
         "zod",
       ],
       output: {
+        // Preserve module structure to avoid circular dependency issues
+        preserveModules: false,
+        // Use named exports
+        exports: "named",
+        // Avoid variable hoisting issues
+        hoistTransitiveImports: false,
+        // Proper globals mapping
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
           "react/jsx-runtime": "jsxRuntime",
         },
+        // Ensure proper interop for CJS
+        interop: "auto",
       },
     },
     sourcemap: true,
-    minify: "esbuild",
+    // Disable minification to avoid hoisting issues
+    minify: false,
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
   },
 });
