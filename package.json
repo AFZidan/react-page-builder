@@ -32,8 +32,9 @@
     "changelog": "bash scripts/generate-changelog.sh",
     "release:preview": "node scripts/preview-release-notes.js",
     "prepublishOnly": "npm run build",
-    "preversion": "echo 'Skipping lint and test for now'",
-    "postversion": "echo 'Version updated successfully'"
+    "preversion": "npm run build",
+    "version": "git add package.json",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "page-builder",
