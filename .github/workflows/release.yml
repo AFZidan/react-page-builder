@@ -75,21 +75,54 @@ jobs:
                     git push origin HEAD:main
                   fi
 
-            - name: Create GitHub Release
-              uses: actions/create-release@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  tag_name: ${{ github.ref }}
-                  release_name: Release v${{ steps.get_version.outputs.version }}
-                  body_path: release_notes.md
-                  draft: false
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            const version = tag.replace('v', '');
+            
+            // Check if release already exists
+            try {
+              await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: tag
+              });
+              console.log(`Release ${tag} already exists, skipping creation`);
+            } catch (error) {
+              if (error.status === 404) {
+                // Read release notes
+                const fs = require('fs');
+                let body = '';
+                try {
+                  body = fs.readFileSync('release_notes.md', 'utf8');
+                } catch (e) {
+                  body = `# Release v${version}\n\nSee CHANGELOG.md for details.`;
+                }
+                
+                // Create release
+                await github.rest.repos.createRelease({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  tag_name: tag,
+                  name: `Release v${version}`,
+                  body: body,
+                  draft: false,
                   prerelease: false
+                });
+                console.log(`Created release ${tag}`);
+              } else {
+                throw error;
+              }
+            }
 
-            - name: Generate detailed release notes
-              uses: actions/github-script@v7
-              with:
-                  script: |
+      - name: Generate detailed release notes
+        uses: actions/github-script@v7
+        with:
+          script: |
                       const tag = context.ref.replace('refs/tags/', '');
                       const version = tag.replace('v', '');
 
