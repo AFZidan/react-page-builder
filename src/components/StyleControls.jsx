@@ -55,7 +55,7 @@ export function ColorPicker({ label, value, onChange, showBrandColors = false, b
   );
 }
 
-export function SpacingControl({ label, value, onChange, property = 'padding' }) {
+export function SpacingControl({ label, value, onChange, _property = 'padding' }) {
   const [mode, setMode] = useState('all'); // 'all' or 'individual'
   const [values, setValues] = useState({
     all: '0px',

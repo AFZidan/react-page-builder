@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { ColorPicker, SpacingControl, TypographyControl, BorderControl, ShadowControl, DisplayControl } from "./components/StyleControls";
 import IconPicker from "./components/IconPicker";
@@ -14,7 +14,6 @@ export default function PageBuilder({
   onBack,
   pageName = 'Page Builder',
   pageSlug = '',
-  brandColors = [],
 }) {
   const id = pageId;
   const [page, setPage] = useState({ id: pageId, name: pageName, slug: pageSlug });
@@ -22,7 +21,6 @@ export default function PageBuilder({
   const [saving, setSaving] = useState(false);
   const [components, setComponents] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [draggedIndex, setDraggedIndex] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [resizingId, setResizingId] = useState(null);
   const [resizeStart, setResizeStart] = useState({ width: 0, height: 0, x: 0, y: 0 });
@@ -32,7 +30,6 @@ export default function PageBuilder({
   const [altKeyPressed, setAltKeyPressed] = useState(false);
   const [activeTab, setActiveTab] = useState('content'); // content, style, advanced
   const [showAddMenu, setShowAddMenu] = useState(null); // ID of container showing add menu
-  const [draggedComponentType, setDraggedComponentType] = useState(null);
   const [fullWidth, setFullWidth] = useState(() => localStorage.getItem('builder.fullWidth') === 'true');
   const [device, setDevice] = useState(() => localStorage.getItem('builder.device') || 'Desktop');
   const [zoom, setZoom] = useState(() => parseFloat(localStorage.getItem('builder.zoom')) || 100);
@@ -152,7 +149,7 @@ export default function PageBuilder({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId, editingId]);
+  }, [selectedId, editingId, deleteComponent, findComponent]);
 
   // Element resize handlers with corner support
   useEffect(() => {
@@ -279,7 +276,7 @@ export default function PageBuilder({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [resizingId, resizeStart]);
+  }, [resizingId, resizeStart, findComponent, recalcContainerSize, updateComponent, components]);
 
   // Drag to position handlers with snapping
   useEffect(() => {
@@ -395,7 +392,7 @@ export default function PageBuilder({
       window.removeEventListener('mouseup', handleMouseUp);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [draggingId, dragStart, altKeyPressed, components]);
+  }, [draggingId, dragStart, altKeyPressed, components, findComponent, recalcContainerSize, updateComponent]);
 
   // Initialize page data from props
   useEffect(() => {
@@ -545,7 +542,7 @@ export default function PageBuilder({
   };
 
   // Update component (supports nested)
-  const updateComponent = (id, updates) => {
+  const updateComponent = useCallback((id, updates) => {
     const updateNested = (items) => {
       return items.map(c => {
         if (c.id === id) {
@@ -558,7 +555,7 @@ export default function PageBuilder({
       });
     };
     setComponents(updateNested(components));
-  };
+  }, [components]);
 
   // Helper to update component styles
   const updateComponentStyle = (property, value) => {
@@ -580,7 +577,7 @@ export default function PageBuilder({
   };
 
   // Auto-resize container to fit children
-  const recalcContainerSize = (parentId) => {
+  const recalcContainerSize = useCallback((parentId) => {
     const parent = findComponent(parentId);
     if (!parent || !parent.children || parent.children.length === 0) return;
 
@@ -631,7 +628,7 @@ export default function PageBuilder({
       width: `${newWidth}px`,
       height: `${newHeight}px`
     });
-  };
+  }, [updateComponent, findComponent]);
 
   // Generate inline styles from visual controls
   const generateInlineStyles = (component) => {
@@ -685,7 +682,7 @@ export default function PageBuilder({
   };
 
   // Delete component (supports nested)
-  const deleteComponent = (id) => {
+  const deleteComponent = useCallback((id) => {
     const deleteNested = (items) => {
       return items.filter(c => c.id !== id).map(c => {
         if (c.children) {
@@ -696,10 +693,10 @@ export default function PageBuilder({
     };
     setComponents(deleteNested(components));
     setSelectedId(null);
-  };
+  }, [components]);
 
   // Find component by ID (supports nested)
-  const findComponent = (id, items = components) => {
+  const findComponent = useCallback((id, items = components) => {
     for (const item of items) {
       if (item.id === id) return item;
       if (item.children) {
@@ -708,7 +705,7 @@ export default function PageBuilder({
       }
     }
     return null;
-  };
+  }, [components]);
 
   // Duplicate component
   const duplicateComponent = (id) => {
@@ -722,42 +719,6 @@ export default function PageBuilder({
     }
   };
 
-  // Drag and drop handlers
-  const handleDragStart = (index) => {
-    setDraggedIndex(index);
-  };
-
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === index) return;
-    
-    const newComponents = [...components];
-    const draggedItem = newComponents[draggedIndex];
-    newComponents.splice(draggedIndex, 1);
-    newComponents.splice(index, 0, draggedItem);
-    
-    setComponents(newComponents);
-    setDraggedIndex(index);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-  };
-
-  // Move component up/down
-  const moveUp = (index) => {
-    if (index === 0) return;
-    const newComponents = [...components];
-    [newComponents[index - 1], newComponents[index]] = [newComponents[index], newComponents[index - 1]];
-    setComponents(newComponents);
-  };
-
-  const moveDown = (index) => {
-    if (index === components.length - 1) return;
-    const newComponents = [...components];
-    [newComponents[index], newComponents[index + 1]] = [newComponents[index + 1], newComponents[index]];
-    setComponents(newComponents);
-  };
 
   // Context menu handlers
   const handleContextMenu = (e, componentId) => {
@@ -799,7 +760,7 @@ export default function PageBuilder({
   const selectedComponent = selectedId ? findComponent(selectedId) : null;
 
   // Recursive component renderer
-  const renderComponent = (component, index, parentComponents) => {
+  const renderComponent = (component, _index, _parentComponents) => {
     const isContainer = component.type === 'columns' || component.type === 'container' || component.type === 'form-container';
     const hasChildren = component.children && component.children.length > 0;
     const position = component.position || { x: 0, y: 0 };

@@ -2,12 +2,10 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 
 export default function FormWithValidation({ component, children }) {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { handleSubmit, formState: { errors } } = useForm();
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data) => {
-    setIsSubmitting(true);
     setSubmitStatus({ type: '', message: '' });
 
     try {
@@ -33,8 +31,6 @@ export default function FormWithValidation({ component, children }) {
         type: 'error',
         message: component.errorMessage || 'Failed to submit form. Please try again.',
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

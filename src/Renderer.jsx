@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import DynamicIcon from "./components/DynamicIcon";
 import FormWithValidation from "./components/FormWithValidation";
@@ -217,13 +217,8 @@ export default function Renderer({
   pageName = '',
   pageSlug = ''
 }) {
-  const [page, setPage] = useState({
-    name: pageName,
-    slug: pageSlug,
-    status: isDraft ? 'DRAFT' : 'PUBLISHED',
-    canvasJson: { components }
-  });
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
+  const [page] = useState({ name: pageName, slug: pageSlug });
 
   if (loading) {
     return (
