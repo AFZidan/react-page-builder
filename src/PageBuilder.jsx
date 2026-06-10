@@ -620,6 +620,9 @@ export default function PageBuilder({
       case 'form-submit':
         newComponent = { ...newComponent, content: 'Submit', className: 'btn btn-primary', width: 'auto', height: 'auto' };
         break;
+      case 'services':
+        newComponent = { ...newComponent, className: 'w-full', width: '100%', height: 'auto' };
+        break;
       default:
         newComponent = { ...newComponent, content: '', className: '', width: '100px', height: 'auto' };
     }
@@ -1348,6 +1351,14 @@ export default function PageBuilder({
             {component.content}
           </button>
         )}
+        {component.type === 'services' && (
+          <div className="border-2 border-dashed border-primary/30 rounded-xl p-8 text-center bg-primary/5 w-full">
+            <p className="font-medium text-gray-800">Services section</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Live featured services from Services Management appear here on the public site.
+            </p>
+          </div>
+        )}
         {component.type === 'columns' && (
           <div 
             className={component.className}
@@ -1413,9 +1424,9 @@ export default function PageBuilder({
   };
 
   return (
-    <div className="h-screen flex flex-col bg-base-100">
+    <div className="h-full min-h-0 flex flex-col bg-base-100">
       {/* Header */}
-      <div className="border-b border-base-300 px-6 py-4 flex items-center justify-between bg-base-200">
+      <div className="shrink-0 sticky top-0 z-10 border-b border-base-300 px-6 py-4 flex items-center justify-between bg-base-200">
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="btn btn-sm btn-ghost">
             ← Back
@@ -1488,7 +1499,7 @@ export default function PageBuilder({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex overflow-hidden">
         {/* Left Sidebar - Component Palette */}
         {!fullWidth && (
         <div className="w-64 bg-base-100 border-r border-base-300 p-4 overflow-y-auto">
@@ -1553,6 +1564,22 @@ export default function PageBuilder({
             >
               🖼️ Image
             </button>
+            </div>
+          </div>
+
+          <div className="divider my-2"></div>
+
+          <div className="mb-4">
+            <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Site Sections</h4>
+            <div className="space-y-2">
+              <button
+                onClick={() => addComponent('services')}
+                draggable="true"
+                onDragStart={(e) => e.dataTransfer.setData('componentType', 'services')}
+                className="btn btn-sm btn-block justify-start cursor-grab active:cursor-grabbing"
+              >
+                🛠 Services
+              </button>
             </div>
           </div>
 
